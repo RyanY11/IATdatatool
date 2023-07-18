@@ -23,12 +23,12 @@ import pandas as pd
 import os
 
 # 数据模板下载
-# @st.cache
-# def convert_df(dataframe):
-#     return dataframe.to_csv().encode('utf-8')
+@st.cache
+def convert_df(dataframe):
+    return dataframe.to_csv().encode('utf-8')
 
 local_path = os.getcwd()
-data_model = pd.read_csv(os.path.join(local_path, 'data_sample.csv'))
+data_model = convert_df(pd.read_csv(os.path.join(local_path, 'data_sample.csv')))
 
 # 页面绘制
 st.title('IAT数据处理工具')

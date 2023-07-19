@@ -34,8 +34,20 @@ data_model = convert_df(pd.read_csv(os.path.join(local_path, 'data_sample.csv'))
 st.title('IAT数据处理工具')
 st.info('从这里开始一些测试')
 st.write(' ')
+
 st.header('Step 1. 下载数据模板')
 st.info('点击下载数据模板，并按照模板填写数据表')
-st.download_button('下载数据模板',data=data_model,file_name='data_sample.csv',mime='text/csv')
+st.download_button('下载数据模板',
+                   data=data_model,
+                   file_name='data_sample.csv',
+                   mime='text/csv')
 
-st.balloons()
+st.write(' ')
+st.header('Step 2. 上传IAT实验数据')
+st.info('将填写完的数据文件上传')
+data_file = st.file_uploader('选择数据文件')
+if data_file is not None:
+    user_data = pd.read_csv(data_file)
+    st.dataframe(user_data)
+
+# st.balloons()

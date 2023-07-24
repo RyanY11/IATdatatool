@@ -32,13 +32,13 @@ data_model = convert_df(pd.read_csv(os.path.join(local_path, 'data_sample.csv'))
 
 # 数据表校验
 def check_data(dataframe):
-    default_col = ['Subject','Running','Stim_ACC','Stim_RT']
+    default_col = ['Participant','Running','Stim_ACC','Stim_RT']
     missing = [col for col in default_col if col not in dataframe]
     if len(missing) == 0:
-        st.write("数据表中包含所有所需的列。")
+        st.info("数据表中包含所有所需的列。下方显示为上传的数据内容：")
         return True
     else:
-        st.write(f"数据表缺少以下列：{', '.join(missing)}")
+        st.info(f"※数据表缺少以下列：{', '.join(missing)}")
         return False
 
 

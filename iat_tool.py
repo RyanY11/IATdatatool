@@ -175,6 +175,6 @@ if confirm == True:
 
 st.write(' ')
 st.header('一些参考文献')
-st.write('[[1]杨晨, & 陈增祥. (2019). 数字有形状吗?数字信息精确性和品牌标识形状的匹配效应. 心理学报, 51(7), 16.]')
-st.write('[[2]钱淼, 周立霞, 鲁甜甜, 翁梦星, & 傅根跃. (2015). 幼儿友好型内隐联想测验的建构及有效性. 心理学报, 47(7), 903–913.]')
-st.write('[Greenwald, A. G., Nosek, B. A., & Banaji, M. R. (2003).Understanding and using the implicit association test: An improved scoring algorithm. Journal of Personality and Social Psychology,  85(2), 197–216.]')
+st.write('[1]杨晨, & 陈增祥. (2019). 数字有形状吗?数字信息精确性和品牌标识形状的匹配效应. 心理学报, 51(7), 16.')
+st.write('[2]钱淼, 周立霞, 鲁甜甜, 翁梦星, & 傅根跃. (2015). 幼儿友好型内隐联想测验的建构及有效性. 心理学报, 47(7), 903–913.')
+st.write('[3]Greenwald, A. G., Nosek, B. A., & Banaji, M. R. (2003).Understanding and using the implicit association test: An improved scoring algorithm. Journal of Personality and Social Psychology,  85(2), 197–216.')

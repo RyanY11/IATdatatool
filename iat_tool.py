@@ -86,12 +86,12 @@ if check_res == True:
     st.info('选定各项数据预处理方式及参数')
     
     st.subheader('受试者剔除标准', divider=True)
-    part_speed_fast = st.checkbox('过快反应')
+    part_speed_fast = st.checkbox('总体过快反应')
     if part_speed_fast:
         part_too_fast = st.number_input('过快反应阈值：', min_value=0, value=300, placeholder="请输入整数时长...")
         part_too_fast_per = st.number_input('过快反应占比：', min_value=0, max_value=100, value=10, placeholder="请输入整数百分比...")
         st.info('所有试次中，反应时低于 ', part_too_fast, ' ms 的试次超过 ', part_too_fast_per, '% 的受试者数据将被剔除')
-    part_speed_slow = st.checkbox('过慢反应')
+    part_speed_slow = st.checkbox('总体过慢反应')
     if part_speed_slow:
         part_too_slow = st.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...")
         part_too_slow_per = st.number_input('过慢反应占比：', min_value=0, max_value=100, value=10, placeholder="请输入整数百分比...")
@@ -109,11 +109,11 @@ if check_res == True:
     
     
     st.subheader('试次剔除标准', divider=True)
-    trial_speed_fast = st.checkbox('过快反应')
+    trial_speed_fast = st.checkbox('试次过快反应')
     if trial_speed_fast:
         trial_too_fast = st.number_input('过快反应阈值：', min_value=0, value=300, placeholder="请输入整数时长...")
         st.info('所有试次中，反应时低于 ', trial_too_fast, ' ms 的试次数据将被剔除')
-    trial_speed_slow = st.checkbox('过慢反应')
+    trial_speed_slow = st.checkbox('试次过慢反应')
     if trial_speed_slow:
         trial_too_slow = st.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...")
         st.info('所有试次中，反应时高于 ', trial_too_slow, ' ms 的试次数据将被剔除')

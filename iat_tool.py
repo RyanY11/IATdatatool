@@ -71,7 +71,7 @@ def total_speed_flt(dataframe, type, value, percent):
         else:
             flt_df = dataframe[(dataframe['Participant']==i) & (dataframe['Stim_RT']>value)]
         count = len(flt_df)
-        ratio = count / total
+        ratio = round((count / total), 4)
         if ratio > 0.01*percent:
             if type == 'fast':
                 text = '过快反应试次数： ' + str(count) + '，占比： ' + str(100*ratio) + '%'

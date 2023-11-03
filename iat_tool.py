@@ -140,7 +140,7 @@ if check_res == True:
         part_sd_num = st.number_input('反应时标准差倍数：', min_value=0, max_value=10, value=3, placeholder="请输入整数倍标准差...")
         st.write('所有试次的平均反应时在所有参与者平均反应时± ', part_sd_num, ' 个标准差以外的受试者数据将被剔除')
     
-    if st.button('受试者剔除预处理', , key=0):
+    if st.button('受试者剔除预处理', key=0):
         part_fast_flt = total_speed_flt(user_data, 'fast', part_too_fast, part_too_fast_per)[0]
     
         st.text('剔除结果：')

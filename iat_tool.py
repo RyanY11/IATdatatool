@@ -66,6 +66,8 @@ def total_speed_flt(dataframe, type, value, percent):
     part_list = dataframe['Participant'].unique().tolist()
     for i in part_list:
         total = len(dataframe['Participant']==i)
+        print(i)
+        print(total)
         if type == 'fast':
             flt_df = dataframe[(dataframe['Participant']==i) & (dataframe['Stim_RT']<value)]
         else:

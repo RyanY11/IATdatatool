@@ -75,11 +75,11 @@ def total_speed_flt(dataframe, type, value, percent):
         if ratio > 0.01*percent:
             if type == 'fast':
                 text = '过快反应试次数： ' + str(count) + '占比： ' + str(100*ratio) + '%'
-                add_line = pd.DataFrame.from_dict({'受试者编号': i, '剔除原因': '过快反应占比高于设定值', '详情': text},orient='index')
+                add_line = {'受试者编号': i, '剔除原因': '过快反应占比高于设定值', '详情': text}
             else:
                 text = '过慢反应试次数： ' + str(count) + '占比： ' + str(100*ratio) + '%'
-                add_line = pd.DataFrame.from_dict({'受试者编号': i, '剔除原因': '过慢反应占比高于设定值', '详情': text},orient='index')
-            pd.concat([output_df, add_line], axis=0, ignore_index=True)
+                add_line = {'受试者编号': i, '剔除原因': '过慢反应占比高于设定值', '详情': text}
+            output_df.loc[len(output_df), :] = add_line
             flt_list.append(i)
     
     return (output_df, flt_list)

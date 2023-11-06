@@ -577,6 +577,6 @@ st.write('[3]Greenwald, A. G., Nosek, B. A., & Banaji, M. R. (2003).Understandin
 
 st.write(' ')
 st.header('支持作者')
-image = Image.open('QRcode.jpg')
+image = Image.open('QRcode1.jpg')
 st.image(image, caption='如果这个小工具对你有所帮助的话，也可以请我喝杯咖啡~')
 st.write('谢谢啦！ Thanks♪(･ω･)ﾉ')

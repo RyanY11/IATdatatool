@@ -179,7 +179,7 @@ def flt_merge(output_df_list, flt_list, dataframe):
     output_df = pd.concat(output_df_list, axis=0, join='outer', ignore_index=True)
     # new_list = list(dict.fromkeys(flt_list))
     new_list = list(set(flt_list))
-    left_df = dataframe[~dataframe['Participant'].isin(new_list)]
+    left_df = dataframe[~dataframe['Participant'].isin(new_list)].sort_values(by='受试者编号',inplace=True)
     
     return (output_df, left_df)
 
@@ -213,7 +213,8 @@ def trial_speed_flt(dataframe, t_type, value):
                 add_line = {'试次编号': i, '处理原因': '反应时高于设定值', '详情': text}
                 output_df.loc[len(output_df), :] = add_line
                 flt_list.append(i)
-            
+    output_df.sort_values(by='试次编号',inplace=True)
+    
     return (output_df, flt_list)
     
 
@@ -267,7 +268,8 @@ def trial_wrong_flt(dataframe, t_type, value):
                 
     else:
         pass
-    
+    output_df.sort_values(by='试次编号',inplace=True)
+        
     processed_df = dataframe.copy()
     for k in change_list:
         processed_df.loc[k['line'], 'Stim_RT'] = k['value']

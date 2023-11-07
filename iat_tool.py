@@ -201,7 +201,7 @@ def trial_speed_flt(dataframe, t_type, value):
     flt_list = []
     index_list = dataframe.index.tolist()
     for i in index_list:
-        trial_rt = dataframe[(dataframe.index==i)]['Stim_RT']
+        trial_rt = dataframe[(dataframe.index==i)]['Stim_RT'].values[0]
         if t_type == 'fast':
             if trial_rt < value:
                 text = '试次反应时为： ' + str(trial_rt)

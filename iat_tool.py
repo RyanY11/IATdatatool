@@ -403,22 +403,22 @@ if check_res == True:
 
     part_speed_fast = st.checkbox('总体过快反应')
     if part_speed_fast:
-        part_too_fast = st.number_input('过快反应阈值：', min_value=0, value=300, placeholder="请输入整数时长...")
-        part_too_fast_per = st.number_input('过快反应占比：', min_value=0, max_value=100, value=10, placeholder="请输入整数百分比...")
+        part_too_fast = st.number_input('过快反应阈值：', min_value=0, value=300, placeholder="请输入整数时长...", key=0)
+        part_too_fast_per = st.number_input('过快反应占比：', min_value=0, max_value=100, value=10, placeholder="请输入整数百分比...", key=1)
         st.write('所有试次中，反应时低于 ', part_too_fast, ' ms 的试次超过 ', part_too_fast_per, '% 的受试者数据将被剔除')
         
     part_speed_slow = st.checkbox('总体过慢反应')
     if part_speed_slow:
-        part_too_slow = st.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...")
-        part_too_slow_per = st.number_input('过慢反应占比：', min_value=0, max_value=100, value=10, placeholder="请输入整数百分比...")
+        part_too_slow = st.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...", key=2)
+        part_too_slow_per = st.number_input('过慢反应占比：', min_value=0, max_value=100, value=10, placeholder="请输入整数百分比...", key=3)
         st.write('所有试次中，反应时高于 ', part_too_slow, ' ms 的试次超过 ', part_too_slow_per, '% 的受试者数据将被剔除')
     part_acc = st.checkbox('错误率')
     if part_acc:
-        part_acc_num = st.number_input('错误率阈值：', min_value=0, max_value=100, value=35, placeholder="请输入整数百分比...")
+        part_acc_num = st.number_input('错误率阈值：', min_value=0, max_value=100, value=35, placeholder="请输入整数百分比...", key=4)
         st.write('所有试次中，错误率超过 ', part_acc_num, '% 的受试者数据将被剔除')
     part_std = st.checkbox('反应时超出群体反应时标准差')
     if part_std:
-        part_std_num = st.number_input('反应时标准差倍数：', min_value=0, max_value=10, value=3, placeholder="请输入整数倍标准差...")
+        part_std_num = st.number_input('反应时标准差倍数：', min_value=0, max_value=10, value=3, placeholder="请输入整数倍标准差...", key=5)
         st.write('所有试次的平均反应时在所有参与者平均反应时± ', part_std_num, ' 个标准差以外的受试者数据将被剔除')
     
     if st.button(label='确认受试者剔除预处理', key=0):
@@ -465,11 +465,11 @@ if check_res == True:
     
     trial_speed_fast = st.checkbox('试次过快反应')
     if trial_speed_fast:
-        trial_too_fast = st.number_input('过快反应阈值：', min_value=0, value=300, placeholder="请输入整数时长...")
+        trial_too_fast = st.number_input('过快反应阈值：', min_value=0, value=300, placeholder="请输入整数时长...", key=6)
         st.write('所有试次中，反应时低于 ', trial_too_fast, ' ms 的试次数据将被剔除')
     trial_speed_slow = st.checkbox('试次过慢反应')
     if trial_speed_slow:
-        trial_too_slow = st.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...")
+        trial_too_slow = st.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...", key=7)
         st.write('所有试次中，反应时高于 ', trial_too_slow, ' ms 的试次数据将被剔除')
     
     if st.button(label='确认试次剔除预处理', key=1):
@@ -505,7 +505,7 @@ if check_res == True:
     trial_wrong = st.checkbox('错误反应')
     if trial_wrong:
         trial_wrong_choi = st.radio('选择对错误反应的处理方式',['基于该受试者所有正确反应时的平均值','基于该试次的错误反应时'])
-        trial_wrong_val = st.number_input('反应时增加：', min_value=0, value=300, placeholder="请输入整数时长...")
+        trial_wrong_val = st.number_input('反应时增加：', min_value=0, value=300, placeholder="请输入整数时长...", key=8)
         if trial_wrong_choi == '基于该受试者所有正确反应时的平均值':
             t_type = 1
             st.write('错误反应的反应时将替换为该受试者所有正确反应时平均值 + ', trial_wrong_val, ' ms')

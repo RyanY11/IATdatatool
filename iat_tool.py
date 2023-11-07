@@ -69,7 +69,7 @@ def data_overview(dataframe):
     parts = dataframe['Participant'].nunique()
     types = ', '.join(dataframe['Running'].unique().tolist())
     
-    return (rows, parts, types)
+    return rows, parts, types
 
 
 # 总体-过快/过慢剔除

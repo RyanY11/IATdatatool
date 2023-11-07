@@ -63,9 +63,10 @@ def data_overview(dataframe):
     传入——
     dataframe: 需要处理的数据表
     返回——
-    (rows, participants, types): 数据行数/被试数/IAT阶段数
+    (rows, participants, types): 数据行数/被试数/IAT阶段名称
     '''
-    rows = dataframe.shape[0]
+    # rows = dataframe.shape[0]
+    rows = len(dataframe)
     parts = dataframe['Participant'].nunique()
     types = ', '.join(dataframe['Running'].unique().tolist())
     

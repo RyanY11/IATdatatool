@@ -436,17 +436,17 @@ if check_res == True:
         fb_list = []
         flt_list = []
         if part_speed_fast:
-            fb_list.append(part_fast_flt)
-            flt_list.append(part_fast_flt_id)
+            fb_list.extend(part_fast_flt)
+            flt_list.extend(part_fast_flt_id)
         if part_speed_slow:
-            fb_list.append(part_slow_flt)
-            flt_list.append(part_slow_flt_id)
+            fb_list.extend(part_slow_flt)
+            flt_list.extend(part_slow_flt_id)
         if part_acc:
-            fb_list.append(part_rate)
-            flt_list.append(part_rate_id)
+            fb_list.extend(part_rate)
+            flt_list.extend(part_rate_id)
         if part_std:
-            fb_list.append(part_times)
-            flt_list.append(part_times_id)
+            fb_list.extend(part_times)
+            flt_list.extend(part_times_id)
         
         total_flt_res, total_flt_data = flt_merge(fb_list, flt_list, user_data)
         st.write(total_flt_res)

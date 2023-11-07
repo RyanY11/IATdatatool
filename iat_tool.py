@@ -176,10 +176,10 @@ def flt_merge(output_df_list, flt_list, dataframe):
     left_df: 剩余被试的数据表
     '''
     
-    output_df = pd.concat(output_df_list, axis=0, join='outer', ignore_index=True)
+    output_df = pd.concat(output_df_list, axis=0, join='outer', ignore_index=True).sort_values(by='受试者编号',inplace=True)
     # new_list = list(dict.fromkeys(flt_list))
     new_list = list(set(flt_list))
-    left_df = dataframe[~dataframe['Participant'].isin(new_list)].sort_values(by='受试者编号',inplace=True)
+    left_df = dataframe[~dataframe['Participant'].isin(new_list)]
     
     return (output_df, left_df)
 

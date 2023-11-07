@@ -528,6 +528,9 @@ if check_res == True:
         
 
 confirm = False
+part_method = {}
+trial_method = {}
+wrong_method = {}
 
 if check_name == True:
     st.write(' ')

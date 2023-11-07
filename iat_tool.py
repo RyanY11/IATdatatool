@@ -361,11 +361,13 @@ if data_file is not None:
     check_res = check_data(user_data)
     if check_res == True:
         st.dataframe(user_data)
-        res_rows,res_parts,res_types = data_overview(user_data)
+        # res_rows,res_parts,res_types = data_overview(user_data)
+        res = data_overview(user_data)
         st.subheader('数据表概览', divider='rainbow')
-        st.write('数据行数： ' + res_rows)
-        st.write('包含的受试者人数： ' + res_parts)
-        st.write('包含的IAT阶段： ' + res_types)
+        st.write(res)
+        # st.write('数据行数： ' + res_rows)
+        # st.write('包含的受试者人数： ' + res_parts)
+        # st.write('包含的IAT阶段： ' + res_types)
     
 if check_res == True:
 

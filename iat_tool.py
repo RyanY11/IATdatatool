@@ -490,7 +490,7 @@ if check_res == True:
             flt_list.extend(trial_fast_flt_id)
         if trial_speed_slow:
             fb_list.append(trial_slow_flt)
-            flt_list.append(trial_slow_flt_id)
+            flt_list.extend(trial_slow_flt_id)
         
         trial_flt_res, trial_flt_data = flt_merge(fb_list, flt_list, total_flt_data, '试次编号')
         st.write(total_flt_res)

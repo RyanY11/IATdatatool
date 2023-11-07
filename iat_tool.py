@@ -406,7 +406,8 @@ if check_res == True:
         part_too_fast = st.number_input('过快反应阈值：', min_value=0, value=300, placeholder="请输入整数时长...", key=0)
         part_too_fast_per = st.number_input('过快反应占比：', min_value=0, max_value=100, value=10, placeholder="请输入整数百分比...", key=1)
         st.write('所有试次中，反应时低于 ', part_too_fast, ' ms 的试次超过 ', part_too_fast_per, '% 的受试者数据将被剔除')
-        
+
+    total_flt_data = []
     part_speed_slow = st.checkbox('总体过慢反应')
     if part_speed_slow:
         part_too_slow = st.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...", key=2)
@@ -485,7 +486,7 @@ if check_res == True:
         flt_list = []
         if trial_speed_fast:
             fb_list.append(trial_fast_flt)
-            flt_list.append(trial_fast_flt_id)
+            flt_list.extend(trial_fast_flt_id)
         if trial_speed_slow:
             fb_list.append(trial_slow_flt)
             flt_list.append(trial_slow_flt_id)

@@ -166,18 +166,19 @@ def total_rt_std_flt(dataframe, times):
 
             
 # 合并总体剔除情况
-def flt_merge(output_df_list, flt_list, dataframe):
+def flt_merge(output_df_list, flt_list, dataframe, order_name):
     '''
     传入——
     output_df_list: 几种总体剔除结果的dataframe list
     flt_list: 剔除的受试者ID list
+    order_name: 排序索引列名
     返回——
     output_df: 剔除的情况表
     left_df: 剩余被试的数据表
     '''
     
     output_df = pd.concat(output_df_list, axis=0, join='outer', ignore_index=True)
-    output_df.sort_values(by='受试者编号',inplace=True)
+    output_df.sort_values(by=order_name,inplace=True)
     # new_list = list(dict.fromkeys(flt_list))
     new_list = list(set(flt_list))
     left_df = dataframe[~dataframe['Participant'].isin(new_list)]
@@ -452,7 +453,7 @@ if check_res == True:
             fb_list.append(part_times)
             flt_list.extend(part_times_id)
         
-        total_flt_res, total_flt_data = flt_merge(fb_list, flt_list, user_data)
+        total_flt_res, total_flt_data = flt_merge(fb_list, flt_list, user_data, '受试者编号')
         st.write(total_flt_res)
         st.write('')
         
@@ -491,7 +492,7 @@ if check_res == True:
             fb_list.append(trial_slow_flt)
             flt_list.append(trial_slow_flt_id)
         
-        trial_flt_res, trial_flt_data = flt_merge(fb_list, flt_list, total_flt_data)
+        trial_flt_res, trial_flt_data = flt_merge(fb_list, flt_list, total_flt_data, '试次编号')
         st.write(total_flt_res)
         st.write('')
         

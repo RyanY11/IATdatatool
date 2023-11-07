@@ -375,14 +375,15 @@ if check_res == True:
     st.text('※请按顺序逐个确定和填写参数！！')
     
     st.subheader('① 指定条件阶段名', divider=True)
-    cong_opts=[]
-    incong_opts=[]
+    cong_opts = []
+    incong_opts = []
+    incong_name = []
     
-    cong_opts = st.multiselect('选择相容条件阶段名', list(set(res_types)))
+    cong_opts = st.multiselect('选择相容条件阶段名', res_types.split(','))
     st.write('将在后续计算中，包含以下相容条件阶段的数据')
     if cong_opts:
         st.write(cong_opts)
-        incong_name = list(set(res_types) - set(cong_opts))
+        incong_name = list(res_types.split(',') - cong_opts)
     incong_opts = st.multiselect('选择不相容条件阶段名', incong_name)
     st.write('将在后续计算中，包含以下不相容条件阶段的数据')
     if incong_opts:

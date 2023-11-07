@@ -275,7 +275,7 @@ def trial_wrong_flt(dataframe, t_type, value):
 
 
 # 描述统计结果
-def data_overview(dataframe):
+def data_descriptive(dataframe):
     '''
     输入——
     dataframe: 传入数据表
@@ -361,13 +361,11 @@ if data_file is not None:
     check_res = check_data(user_data)
     if check_res == True:
         st.dataframe(user_data)
-        # res_rows,res_parts,res_types = data_overview(user_data)
-        res = data_overview(user_data)
+        res_rows,res_parts,res_types = data_overview(user_data)
         st.subheader('数据表概览', divider='rainbow')
-        st.write(res)
-        # st.write('数据行数： ' + res_rows)
-        # st.write('包含的受试者人数： ' + res_parts)
-        # st.write('包含的IAT阶段： ' + res_types)
+        st.write('数据行数： ' + res_rows)
+        st.write('包含的受试者人数： ' + res_parts)
+        st.write('包含的IAT阶段： ' + res_types)
     
 if check_res == True:
 
@@ -377,14 +375,14 @@ if check_res == True:
     st.text('※请按顺序逐个确定和填写参数！！')
     
     st.subheader('① 指定条件阶段名', divider=True)
-    cong_opts==[]
-    incong_opts==[]
+    cong_opts=[]
+    incong_opts=[]
     
-    cong_opts = st.multiselect('选择相容条件阶段名', list(set(res[2])))
+    cong_opts = st.multiselect('选择相容条件阶段名', list(set(res_types)))
     st.write('将在后续计算中，包含以下相容条件阶段的数据')
     if cong_opts:
         st.write(cong_opts)
-        incong_name = list(set(res[2]) - set(cong_opts))
+        incong_name = list(set(res_types) - set(cong_opts))
     incong_opts = st.multiselect('选择不相容条件阶段名', incong_name)
     st.write('将在后续计算中，包含以下不相容条件阶段的数据')
     if incong_opts:
@@ -545,7 +543,7 @@ if confirm == True:
     st.write(' ')
     st.header('Step 5. 描述性结果展示')
     st.info('每个阶段的反应时和正确率结果展示')
-    overview_res = data_overview(trial_wrong_data)
+    overview_res = data_descriptive(trial_wrong_data)
     st.write(overview_res)
     st.write(' ')
 

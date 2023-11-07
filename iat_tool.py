@@ -383,7 +383,7 @@ if check_res == True:
     st.write('将在后续计算中，包含以下相容条件阶段的数据')
     if cong_opts:
         st.write(cong_opts)
-        incong_name = list(res_types.split(',') - cong_opts)
+        incong_name = set(res_types.split(',')).difference(set(cong_opts))
     incong_opts = st.multiselect('选择不相容条件阶段名', incong_name)
     st.write('将在后续计算中，包含以下不相容条件阶段的数据')
     if incong_opts:

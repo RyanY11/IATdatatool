@@ -177,7 +177,8 @@ def flt_merge(output_df_list, flt_list, dataframe):
     '''
     
     output_df = pd.concat(output_df_list, axis=0, join='outer', ignore_index=True)
-    new_list = list(dict.fromkeys(flt_list))
+    # new_list = list(dict.fromkeys(flt_list))
+    new_list = list(set(flt_list))
     left_df = dataframe[~dataframe['Participant'].isin(new_list)]
     
     return (output_df, left_df)
@@ -417,7 +418,7 @@ if check_res == True:
         part_std_num = st.number_input('反应时标准差倍数：', min_value=0, max_value=10, value=3, placeholder="请输入整数倍标准差...")
         st.write('所有试次的平均反应时在所有参与者平均反应时± ', part_std_num, ' 个标准差以外的受试者数据将被剔除')
     
-    if st.button(label='受试者剔除预处理', key=0):
+    if st.button(label='确认受试者剔除预处理', key=0):
         if part_speed_fast:
             part_fast_flt, part_fast_flt_id = total_speed_flt(user_data, 'fast', part_too_fast, part_too_fast_per)
             part_method_list.append({'方法': '总体过快反应', '参数': part_too_fast, '占比': part_too_fast_per, '剔除受试者数量': len(part_fast_flt_id)})
@@ -453,8 +454,11 @@ if check_res == True:
         
         part_method = {'受试者预处理方法': part_method_list}
     
+    st.text('※确认完以上信息后再继续下一步！！')
+    
     st.subheader('③ 试次剔除标准', divider=True)
     trial_method_list = []
+    trial_flt_data = []
     
     trial_speed_fast = st.checkbox('试次过快反应')
     if trial_speed_fast:
@@ -465,7 +469,7 @@ if check_res == True:
         trial_too_slow = st.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...")
         st.write('所有试次中，反应时高于 ', trial_too_slow, ' ms 的试次数据将被剔除')
     
-    if st.button(label='受试者剔除预处理', key=1):
+    if st.button(label='确认试次剔除预处理', key=1):
         if trial_speed_fast:
             trial_fast_flt, trial_fast_flt_id = trial_speed_flt(user_data, 'fast', trial_too_fast)
             trial_method_list.append({'方法': '试次过快反应', '参数': trial_too_fast, '剔除试次数量': len(trial_fast_flt_id)})
@@ -488,6 +492,8 @@ if check_res == True:
         st.write('')
         
         trial_method = {'试次预处理方法': trial_method_list}
+    
+    st.text('※确认完以上信息后再继续下一步！！')
     
     st.subheader('④ 错误反应处理', divider=True)
     wrong_method_list = ''
@@ -517,6 +523,8 @@ if check_res == True:
         wrong_method = {'错误反应预处理方法': wrong_method_list}
     else:
         trial_wrong_data = trial_flt_data.copy()
+    
+    st.text('※确认完以上信息后再继续下一步！！')
         
 
 confirm = False

@@ -270,7 +270,7 @@ def trial_wrong_flt(dataframe, t_type, value):
     else:
         pass
     output_df.sort_values(by='试次编号',inplace=True)
-        
+    
     processed_df = dataframe.copy()
     for k in change_list:
         processed_df.loc[k['line'], 'Stim_RT'] = k['value']
@@ -352,7 +352,7 @@ data_model = convert_df(pd.read_csv(os.path.join(local_path, 'data_sample.csv'))
 st.download_button('下载数据模板',
                    data=data_model,
                    file_name='data_sample.csv',
-                   mime='text/csv')
+                   mime='text/csv', key=9)
 
 st.write(' ')
 st.header('Step 2. 上传IAT实验数据')
@@ -421,7 +421,7 @@ if check_res == True:
         part_std_num = st.number_input('反应时标准差倍数：', min_value=0, max_value=10, value=3, placeholder="请输入整数倍标准差...", key=5)
         st.write('所有试次的平均反应时在所有参与者平均反应时± ', part_std_num, ' 个标准差以外的受试者数据将被剔除')
     
-    if st.button(label='确认受试者剔除预处理', key=0):
+    if st.button(label='确认受试者剔除预处理', key=10):
         if part_speed_fast:
             part_fast_flt, part_fast_flt_id = total_speed_flt(user_data, 'fast', part_too_fast, part_too_fast_per)
             part_method_list.append({'方法': '总体过快反应', '参数': part_too_fast, '占比': part_too_fast_per, '剔除受试者数量': len(part_fast_flt_id)})
@@ -472,7 +472,7 @@ if check_res == True:
         trial_too_slow = st.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...", key=7)
         st.write('所有试次中，反应时高于 ', trial_too_slow, ' ms 的试次数据将被剔除')
     
-    if st.button(label='确认试次剔除预处理', key=1):
+    if st.button(label='确认试次剔除预处理', key=11):
         if trial_speed_fast:
             trial_fast_flt, trial_fast_flt_id = trial_speed_flt(user_data, 'fast', trial_too_fast)
             trial_method_list.append({'方法': '试次过快反应', '参数': trial_too_fast, '剔除试次数量': len(trial_fast_flt_id)})
@@ -513,7 +513,7 @@ if check_res == True:
             t_type = 2
             st.write('错误反应的反应时将替换为该试次反应时 + ', trial_wrong_val, ' ms')
     
-    if st.button(label='错误反应预处理', key=2):
+    if st.button(label='错误反应预处理', key=12):
         trial_wrong_res = pd.DataFrame(columns=['试次编号','处理原因','详情'])
         if trial_wrong:
             trial_wrong_res, trial_wrong_data = trial_wrong_flt(trial_flt_data, t_type, trial_wrong_val)
@@ -550,7 +550,7 @@ if check_name == True:
     st.text('错误反应处理')
     st.write(wrong_method)
     
-    if st.button('确认', key=3):
+    if st.button('确认', key=13):
         st.write('已确认处理方式')
         confirm = True
     
@@ -578,7 +578,7 @@ if confirm == True:
     st.download_button(label='分析结果文件',
                     data=res_data_file,
                     file_name='analysis_result.csv',
-                    mime='csv')
+                    mime='csv', key=14)
 
     st.write('')
     st.info('完成~')

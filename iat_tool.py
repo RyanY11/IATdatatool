@@ -587,7 +587,7 @@ if confirm == True:
     st.header('Step 6. 得到分析结果')
     st.info('计算后的结果展示及下载')
     
-    res_data = core_analysis(trial_wrong_data)
+    res_data = core_analysis(trial_wrong_data, cong_opts, incong_opts)
     
     st.write(res_data)
     st.write('')

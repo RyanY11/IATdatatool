@@ -171,6 +171,7 @@ def flt_merge(output_df_list, flt_list, dataframe, order_name):
     传入——
     output_df_list: 几种总体剔除结果的dataframe list
     flt_list: 剔除的受试者ID list
+    dataframe: 待处理数据表
     order_name: 排序索引列名
     返回——
     output_df: 剔除的情况表
@@ -233,7 +234,7 @@ def trial_wrong_flt(dataframe, t_type, value):
     processed_df: 处理后的数据表
     '''
     
-    output_df = pd.DataFrame(columns=['试次编号','处理原因','详情'])
+    output_df = pd.DataFrame(columns=['试次编号','处理原因','受试者正确反应时均值','详情'])
     # flt_list = []
     change_list = []
     
@@ -245,11 +246,11 @@ def trial_wrong_flt(dataframe, t_type, value):
             part_rt_avg = int((part_cor_df['Stim_RT'].mean()))
             index_list = part_df.index.tolist()
             for i in index_list:
-                trial_acc = part_df[(part_df.index==i)]['Stim_ACC']
-                trial_rt = part_df[(part_df.index==i)]['Stim_RT']
+                trial_acc = part_df[(part_df.index==i)]['Stim_ACC'].values[0]
+                trial_rt = part_df[(part_df.index==i)]['Stim_RT'].values[0]
                 if trial_acc == 0:
                     text = '错误试次反应时为：'+ str(trial_rt)
-                    add_line = {'试次编号': i, '处理原因': '错误反应', '详情': text}
+                    add_line = {'试次编号': i, '处理原因': '错误反应', '受试者正确反应时均值': str(part_rt_avg), '详情': text}
                     output_df.loc[len(output_df), :] = add_line
                     # flt_list.append(i)
                     
@@ -258,8 +259,8 @@ def trial_wrong_flt(dataframe, t_type, value):
     elif t_type == 2:
         index_list = dataframe.index.tolist()
         for i in index_list:
-            trial_acc = dataframe[(dataframe.index==i)]['Stim_ACC']
-            trial_rt = dataframe[(dataframe.index==i)]['Stim_RT']
+            trial_acc = dataframe[(dataframe.index==i)]['Stim_ACC'].values[0]
+            trial_rt = dataframe[(dataframe.index==i)]['Stim_RT'].values[0]
             if trial_acc == 0:
                 text = '错误试次反应时为：'+ str(trial_rt)
                 add_line = {'试次编号': i, '处理原因': '错误反应', '详情': text}
@@ -296,7 +297,7 @@ def data_descriptive(dataframe):
         stage_rt_std = round((stage_df['Stim_RT'].std()), 3)
         stage_acc_avg = round((stage_df['Stim_ACC'].mean()), 3)
         stage_acc_std = round((stage_df['Stim_ACC'].std()), 3)
-        add_line = {'阶段名称': i, '反应时均值': stage_rt_avg, '反应时标准差': stage_rt_std, '正确率均值': stage_acc_avg, '正确率标准差: ': stage_acc_std}
+        add_line = {'阶段名称': i, '反应时均值': stage_rt_avg, '反应时标准差': stage_rt_std, '正确率均值': stage_acc_avg, '正确率标准差': stage_acc_std}
         output_df.loc[len(output_df), :] = add_line
 
     return output_df
@@ -343,6 +344,10 @@ st.title('IAT数据处理工具')
 st.info('从这里开始一些测试')
 st.write(' ')
 
+part_method = {}
+trial_method = {}
+wrong_method = {}
+
 st.header('Step 1. 下载数据模板')
 st.info('点击下载数据模板，并按照模板填写数据表')
 st.text('※请勿改动数据模板的列名！！')
@@ -371,7 +376,7 @@ if data_file is not None:
         st.write('数据行数： ' + res_rows)
         st.write('包含的受试者人数： ' + res_parts)
         st.write('包含的IAT阶段： ' + res_types)
-    
+
 if check_res == True:
 
     st.write(' ')
@@ -379,135 +384,144 @@ if check_res == True:
     st.info('选定各项数据预处理方式及参数')
     st.text('※请按顺序逐个确定和填写参数！！')
     
-    st.subheader('① 指定条件阶段名', divider=True)
+    st.sidebar.subheader('① 指定条件阶段名', divider=True)
     cong_opts = []
     incong_opts = []
     incong_name = []
     
-    cong_opts = st.multiselect('选择相容条件阶段名', res_types.split(','))
-    st.write('将在后续计算中，包含以下相容条件阶段的数据')
+    cong_opts = st.sidebar.multiselect('选择相容条件阶段名', res_types.split(','))
+    st.sidebar.write('将在后续计算中，包含以下相容条件阶段的数据')
     if cong_opts:
-        st.write(cong_opts)
+        st.sidebar.write(cong_opts)
         incong_name = set(res_types.split(',')).difference(set(cong_opts))
-    incong_opts = st.multiselect('选择不相容条件阶段名', incong_name)
-    st.write('将在后续计算中，包含以下不相容条件阶段的数据')
+    incong_opts = st.sidebar.multiselect('选择不相容条件阶段名', incong_name)
+    st.sidebar.write('将在后续计算中，包含以下不相容条件阶段的数据')
     if incong_opts:
-        st.write(incong_opts)
+        st.sidebar.write(incong_opts)
     
     if cong_opts==[] or incong_opts==[]:
         st.warning('请至少选择一个相容条件阶段和一个不相容条件阶段')
     else:
         check_name = True
     
-    st.subheader('② 受试者剔除标准', divider=True)
+    st.sidebar.subheader('② 受试者剔除标准', divider=True)
     part_method_list = []
 
-    part_speed_fast = st.checkbox('总体过快反应')
+    part_speed_fast = st.sidebar.checkbox('总体过快反应')
     if part_speed_fast:
-        part_too_fast = st.number_input('过快反应阈值：', min_value=0, value=300, placeholder="请输入整数时长...", key=0)
-        part_too_fast_per = st.number_input('过快反应占比：', min_value=0, max_value=100, value=10, placeholder="请输入整数百分比...", key=1)
+        part_too_fast = st.sidebar.number_input('过快反应阈值：', min_value=0, value=300, placeholder="请输入整数时长...", key=0)
+        part_too_fast_per = st.sidebar.number_input('过快反应占比：', min_value=0, max_value=100, value=10, placeholder="请输入整数百分比...", key=1)
         st.write('所有试次中，反应时低于 ', part_too_fast, ' ms 的试次超过 ', part_too_fast_per, '% 的受试者数据将被剔除')
-
-    total_flt_data = []
-    part_speed_slow = st.checkbox('总体过慢反应')
+        
+    part_speed_slow = st.sidebar.checkbox('总体过慢反应')
     if part_speed_slow:
-        part_too_slow = st.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...", key=2)
-        part_too_slow_per = st.number_input('过慢反应占比：', min_value=0, max_value=100, value=10, placeholder="请输入整数百分比...", key=3)
+        part_too_slow = st.sidebar.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...", key=2)
+        part_too_slow_per = st.sidebar.number_input('过慢反应占比：', min_value=0, max_value=100, value=10, placeholder="请输入整数百分比...", key=3)
         st.write('所有试次中，反应时高于 ', part_too_slow, ' ms 的试次超过 ', part_too_slow_per, '% 的受试者数据将被剔除')
-    part_acc = st.checkbox('错误率')
+    part_acc = st.sidebar.checkbox('错误率')
     if part_acc:
-        part_acc_num = st.number_input('错误率阈值：', min_value=0, max_value=100, value=35, placeholder="请输入整数百分比...", key=4)
+        part_acc_num = st.sidebar.number_input('错误率阈值：', min_value=0, max_value=100, value=35, placeholder="请输入整数百分比...", key=4)
         st.write('所有试次中，错误率超过 ', part_acc_num, '% 的受试者数据将被剔除')
-    part_std = st.checkbox('反应时超出群体反应时标准差')
+    part_std = st.sidebar.checkbox('反应时超出群体反应时标准差')
     if part_std:
-        part_std_num = st.number_input('反应时标准差倍数：', min_value=0, max_value=10, value=3, placeholder="请输入整数倍标准差...", key=5)
+        part_std_num = st.sidebar.number_input('反应时标准差倍数：', min_value=0, max_value=10, value=3, placeholder="请输入整数倍标准差...", key=5)
         st.write('所有试次的平均反应时在所有参与者平均反应时± ', part_std_num, ' 个标准差以外的受试者数据将被剔除')
     
-    if st.button(label='确认受试者剔除预处理', key=10):
-        if part_speed_fast:
-            part_fast_flt, part_fast_flt_id = total_speed_flt(user_data, 'fast', part_too_fast, part_too_fast_per)
-            part_method_list.append({'方法': '总体过快反应', '参数': part_too_fast, '占比': part_too_fast_per, '剔除受试者数量': len(part_fast_flt_id)})
-        if part_speed_slow:
-            part_slow_flt, part_slow_flt_id = total_speed_flt(user_data, 'slow', part_too_slow, part_too_slow_per)
-            part_method_list.append({'方法': '总体过慢反应', '参数': part_too_slow, '占比': part_too_slow_per, '剔除受试者数量': len(part_slow_flt_id)})
-        if part_acc:
-            part_rate, part_rate_id = total_error_rate_flt(user_data, part_acc_num)
-            part_method_list.append({'方法': '错误率', '参数': part_acc_num, '剔除受试者数量': len(part_rate_id)})
-        if part_std:
-            part_times, part_times_id = total_rt_std_flt(user_data, part_std_num)
-            part_method_list.append({'方法': '反应时超出群体反应时标准差', '参数': part_std_num, '剔除受试者数量': len(part_times_id)})
+    total_flt_data = []
+    # if st.button(label='确认受试者剔除预处理', key=10):
+    if part_speed_fast:
+        part_fast_flt, part_fast_flt_id = total_speed_flt(user_data, 'fast', part_too_fast, part_too_fast_per)
+        part_method_list.append({'方法': '总体过快反应', '参数': part_too_fast, '占比': part_too_fast_per, '剔除受试者数量': len(part_fast_flt_id)})
+    if part_speed_slow:
+        part_slow_flt, part_slow_flt_id = total_speed_flt(user_data, 'slow', part_too_slow, part_too_slow_per)
+        part_method_list.append({'方法': '总体过慢反应', '参数': part_too_slow, '占比': part_too_slow_per, '剔除受试者数量': len(part_slow_flt_id)})
+    if part_acc:
+        part_rate, part_rate_id = total_error_rate_flt(user_data, part_acc_num)
+        part_method_list.append({'方法': '错误率', '参数': part_acc_num, '剔除受试者数量': len(part_rate_id)})
+    if part_std:
+        part_times, part_times_id = total_rt_std_flt(user_data, part_std_num)
+        part_method_list.append({'方法': '反应时超出群体反应时标准差', '参数': part_std_num, '剔除受试者数量': len(part_times_id)})
+
+    st.text('处理结果：')
+    part_fb_list = []
+    part_flt_list = []
+    if part_speed_fast:
+        part_fb_list.append(part_fast_flt)
+        part_flt_list.extend(part_fast_flt_id)
+    if part_speed_slow:
+        part_fb_list.append(part_slow_flt)
+        part_flt_list.extend(part_slow_flt_id)
+    if part_acc:
+        part_fb_list.append(part_rate)
+        part_flt_list.extend(part_rate_id)
+    if part_std:
+        part_fb_list.append(part_times)
+        part_flt_list.extend(part_times_id)
     
-        st.text('处理结果：')
-        fb_list = []
-        flt_list = []
-        if part_speed_fast:
-            fb_list.append(part_fast_flt)
-            flt_list.extend(part_fast_flt_id)
-        if part_speed_slow:
-            fb_list.append(part_slow_flt)
-            flt_list.extend(part_slow_flt_id)
-        if part_acc:
-            fb_list.append(part_rate)
-            flt_list.extend(part_rate_id)
-        if part_std:
-            fb_list.append(part_times)
-            flt_list.extend(part_times_id)
-        
-        total_flt_res, total_flt_data = flt_merge(fb_list, flt_list, user_data, '受试者编号')
+    if part_fb_list != []:
+        total_flt_res, total_flt_data = flt_merge(part_fb_list, part_flt_list, user_data, '受试者编号')
         st.write(total_flt_res)
-        st.write('')
-        
-        part_method = {'受试者预处理方法': part_method_list}
+    else:
+        st.write('*未选择受试者预处理方法')
+    
+    st.write('')
+    part_method = {'受试者预处理方法': part_method_list}
     
     st.text('※确认完以上信息后再继续下一步！！')
     
-    st.subheader('③ 试次剔除标准', divider=True)
+    st.sidebar.subheader('③ 试次剔除标准', divider=True)
     trial_method_list = []
     trial_flt_data = []
     
-    trial_speed_fast = st.checkbox('试次过快反应')
+    trial_speed_fast = st.sidebar.checkbox('试次过快反应')
     if trial_speed_fast:
-        trial_too_fast = st.number_input('过快反应阈值：', min_value=0, value=300, placeholder="请输入整数时长...", key=6)
+        trial_too_fast = st.sidebar.number_input('过快反应阈值：', min_value=0, value=300, placeholder="请输入整数时长...", key=6)
         st.write('所有试次中，反应时低于 ', trial_too_fast, ' ms 的试次数据将被剔除')
-    trial_speed_slow = st.checkbox('试次过慢反应')
+    trial_speed_slow = st.sidebar.checkbox('试次过慢反应')
     if trial_speed_slow:
-        trial_too_slow = st.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...", key=7)
+        trial_too_slow = st.sidebar.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...", key=7)
         st.write('所有试次中，反应时高于 ', trial_too_slow, ' ms 的试次数据将被剔除')
     
-    if st.button(label='确认试次剔除预处理', key=11):
-        if trial_speed_fast:
-            trial_fast_flt, trial_fast_flt_id = trial_speed_flt(user_data, 'fast', trial_too_fast)
-            trial_method_list.append({'方法': '试次过快反应', '参数': trial_too_fast, '剔除试次数量': len(trial_fast_flt_id)})
-        if trial_speed_slow:
-            trial_slow_flt, trial_slow_flt_id = trial_speed_flt(user_data,'slow', trial_too_slow)
-            trial_method_list.append({'方法': '试次过慢反应', '参数': trial_too_slow, '剔除试次数量': len(trial_slow_flt_id)})
+    # if st.button(label='确认试次剔除预处理', key=11):
+    if trial_speed_fast:
+        trial_fast_flt, trial_fast_flt_id = trial_speed_flt(user_data, 'fast', trial_too_fast)
+        trial_method_list.append({'方法': '试次过快反应', '参数': trial_too_fast, '剔除试次数量': len(trial_fast_flt_id)})
+    if trial_speed_slow:
+        trial_slow_flt, trial_slow_flt_id = trial_speed_flt(user_data,'slow', trial_too_slow)
+        trial_method_list.append({'方法': '试次过慢反应', '参数': trial_too_slow, '剔除试次数量': len(trial_slow_flt_id)})
+
+    st.text('处理结果：')
+    trial_fb_list = []
+    trial_flt_list = []
+    if trial_speed_fast:
+        trial_fb_list.append(trial_fast_flt)
+        trial_flt_list.extend(trial_fast_flt_id)
+    if trial_speed_slow:
+        trial_fb_list.append(trial_slow_flt)
+        trial_flt_list.extend(trial_slow_flt_id)
     
-        st.text('处理结果：')
-        fb_list = []
-        flt_list = []
-        if trial_speed_fast:
-            fb_list.append(trial_fast_flt)
-            flt_list.extend(trial_fast_flt_id)
-        if trial_speed_slow:
-            fb_list.append(trial_slow_flt)
-            flt_list.extend(trial_slow_flt_id)
-        
-        trial_flt_res, trial_flt_data = flt_merge(fb_list, flt_list, total_flt_data, '试次编号')
-        st.write(total_flt_res)
-        st.write('')
-        
-        trial_method = {'试次预处理方法': trial_method_list}
+    if part_fb_list != []:
+        if trial_fb_list != []:
+            trial_flt_res, trial_flt_data = flt_merge(trial_fb_list, trial_flt_list, total_flt_data, '试次编号')
+            # trial_flt_res, trial_flt_data = flt_merge(fb_list, flt_list, user_data, '试次编号')
+            st.write(trial_flt_res)
+        else:
+            st.write('*未选择试次预处理方法')
+    else:
+        st.write('*请先按受试者处理后，再进行试次处理')
+    st.write('')
+    trial_method = {'试次预处理方法': trial_method_list}
     
     st.text('※确认完以上信息后再继续下一步！！')
     
-    st.subheader('④ 错误反应处理', divider=True)
+    st.sidebar.subheader('④ 错误反应处理', divider=True)
     wrong_method_list = ''
     
     t_type = 0
-    trial_wrong = st.checkbox('错误反应')
+    trial_wrong = st.sidebar.checkbox('错误反应')
     if trial_wrong:
-        trial_wrong_choi = st.radio('选择对错误反应的处理方式',['基于该受试者所有正确反应时的平均值','基于该试次的错误反应时'])
-        trial_wrong_val = st.number_input('反应时增加：', min_value=0, value=300, placeholder="请输入整数时长...", key=8)
+        trial_wrong_choi = st.sidebar.radio('选择对错误反应的处理方式',['基于该受试者所有正确反应时的平均值','基于该试次的错误反应时'])
+        trial_wrong_val = st.sidebar.number_input('反应时增加：', min_value=0, value=300, placeholder="请输入整数时长...", key=8)
         if trial_wrong_choi == '基于该受试者所有正确反应时的平均值':
             t_type = 1
             st.write('错误反应的反应时将替换为该受试者所有正确反应时平均值 + ', trial_wrong_val, ' ms')
@@ -515,27 +529,31 @@ if check_res == True:
             t_type = 2
             st.write('错误反应的反应时将替换为该试次反应时 + ', trial_wrong_val, ' ms')
     
-    if st.button(label='错误反应预处理', key=12):
-        trial_wrong_res = pd.DataFrame(columns=['试次编号','处理原因','详情'])
-        if trial_wrong:
-            trial_wrong_res, trial_wrong_data = trial_wrong_flt(trial_flt_data, t_type, trial_wrong_val)
-            wrong_method_list = {'方法': trial_wrong_choi, '参数': trial_wrong_val, '处理试次数量': len(trial_wrong_data)}
-            
-        st.text('处理结果：')
-        st.write(trial_wrong_res)
-        st.write('')
+    # if st.button(label='确认错误反应预处理', key=12):
+    trial_wrong_res = pd.DataFrame(columns=['试次编号','处理原因','详情'])
+    if part_fb_list != []:
+        if trial_fb_list != []:
+            if trial_wrong:
+                trial_wrong_res, trial_wrong_data = trial_wrong_flt(trial_flt_data, t_type, trial_wrong_val)
+                wrong_method_list = {'方法': trial_wrong_choi, '参数': trial_wrong_val, '处理试次数量': len(trial_wrong_data)}
         
-        wrong_method = {'错误反应预处理方法': wrong_method_list}
+    st.text('处理结果：')
+    if part_fb_list != []:
+        if trial_fb_list != []:
+            st.write(trial_wrong_res)
+        else:
+            st.write('*请先按试次处理后，再进行错误处理')
     else:
-        trial_wrong_data = trial_flt_data.copy()
+        st.write('*请先按受试者和试次处理后，再进行错误处理')
+    st.write('')
+    
+    wrong_method = {'错误反应预处理方法': wrong_method_list}
+    # else:
+    #     trial_wrong_data = trial_flt_data.copy()
     
     st.text('※确认完以上信息后再继续下一步！！')
-        
-
+    
 confirm = False
-part_method = {}
-trial_method = {}
-wrong_method = {}
 
 if check_name == True:
     st.write(' ')

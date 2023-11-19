@@ -234,11 +234,10 @@ def trial_wrong_flt(dataframe, t_type, value):
     processed_df: 处理后的数据表
     '''
     
-    output_df = pd.DataFrame(columns=['试次编号','处理原因','受试者正确反应时均值','详情'])
-    # flt_list = []
     change_list = []
     
     if t_type == 1:
+        output_df = pd.DataFrame(columns=['试次编号','处理原因','受试者正确反应时均值','详情'])
         part_list = dataframe['Participant'].unique().tolist()
         for j in part_list:
             part_df = dataframe[(dataframe['Participant']==j)]
@@ -257,6 +256,7 @@ def trial_wrong_flt(dataframe, t_type, value):
                     change_list.append({'line': i, 'value': part_rt_avg + value})
     
     elif t_type == 2:
+        output_df = pd.DataFrame(columns=['试次编号','处理原因','详情'])
         index_list = dataframe.index.tolist()
         for i in index_list:
             trial_acc = dataframe[(dataframe.index==i)]['Stim_ACC'].values[0]
@@ -309,12 +309,14 @@ def core_analysis(dataframe, cong_list, incong_list):
     '''
     输入——
     dataframe: 传入数据表
+    cong_list: 一致条件列表
+    incong_list: 不一致条件列表
     返回——
     output_df: 处理后的数据表
     '''
     
-    output_df = pd.DataFrame(columns=['Participant', 'Congurant_RT_avg', 'Congurant_RT_std', 'Incongurant_RT_avg', 'Incongurant_RT_std', 
-                                      'All_RT_avg', 'All_RT_std', 'd_value'])
+    output_df = pd.DataFrame(columns=['受试者编号', '一致反应时均值', '一致反应时标准差', '不一致反应时均值', '不一致反应时标准差', 
+                                      '全部反应时均值', '全部反应时标准差', 'd值'])
     part_list = dataframe['Participant'].unique().tolist()
     for i in part_list:
         part_df = dataframe[(dataframe['Participant']==i)]
@@ -331,9 +333,9 @@ def core_analysis(dataframe, cong_list, incong_list):
         
         d_val = round(((part_incong_rt_avg - part_cong_rt_avg) / part_both_rt_std), 3)
         
-        add_line = {'Participant': i, 'Congurant_RT_avg': part_cong_rt_avg, 'Congurant_RT_std': part_cong_rt_std, 
-                   'Incongurant_RT_avg': part_incong_rt_avg, 'Incongurant_RT_std': part_incong_rt_std, 
-                   'All_RT_avg': part_both_rt_avg, 'All_RT_std': part_both_rt_std, 'd_value': d_val}
+        add_line = {'受试者编号': i, '一致反应时均值': part_cong_rt_avg, '一致反应时标准差': part_cong_rt_std, 
+                   '不一致反应时均值': part_incong_rt_avg, '不一致反应时标准差': part_incong_rt_std, 
+                   '全部反应时均值': part_both_rt_avg, '全部反应时标准差': part_both_rt_std, 'd值': d_val}
         output_df.loc[len(output_df), :] = add_line
     
     return output_df
@@ -341,7 +343,13 @@ def core_analysis(dataframe, cong_list, incong_list):
 
 # 页面逻辑与绘制
 st.title('IAT数据处理工具')
-st.info('从这里开始一些测试')
+st.info('工具简介')
+st.text('Hi，欢迎你来到这~')
+st.write(' ')
+st.text('这是一个在线的IAT（内隐联想测验）数据处理工具，它能够帮助你便捷地处理研究参与者在IAT实验中的反应时和正确率数据，并最终完成内隐方向强度d值的计算。')
+st.text('接下来，请按照页面上的指示，上传固定好格式的实验数据表格，依据你的参考文献选取各项数据处理的方式和参数，确认后即可在页面上看到自动处理的结果，并支持下载结果表格。')
+st.text('这是一个开源的小工具，开源地址详见页面末尾。')
+st.text('此外，请放心，你的实验数据上传后只是在浏览器本地的缓存中进行处理，并不会泄露。')
 st.write(' ')
 
 part_method = {}
@@ -350,6 +358,9 @@ wrong_method = {}
 
 st.header('Step 1. 下载数据模板')
 st.info('点击下载数据模板，并按照模板填写数据表')
+st.text('数据表中需要包含的信息：/n受试者编号（建议为纯数字），/n该trial属于实验的阶段名称（比如stage4代表联合测验相容条件，stage7代表联合测验反转不相容条件）\
+        /n该trial的反应时，/n该trial的正误')
+st.write(' ')
 st.text('※请勿改动数据模板的列名！！')
 
 local_path = os.getcwd()
@@ -381,7 +392,7 @@ if check_res == True:
 
     st.write(' ')
     st.header('Step 3. 选择预处理参数')
-    st.info('选定各项数据预处理方式及参数')
+    st.info('在侧边栏中选定各项数据预处理方式及参数')
     st.text('※请按顺序逐个确定和填写参数！！')
     
     st.sidebar.subheader('① 指定条件阶段名', divider=True)
@@ -392,12 +403,14 @@ if check_res == True:
     cong_opts = st.sidebar.multiselect('选择相容条件阶段名', res_types.split(','))
     st.sidebar.write('将在后续计算中，包含以下相容条件阶段的数据')
     if cong_opts:
-        st.sidebar.write(cong_opts)
+        st.write('选择的相容条件阶段名：')
+        st.write(cong_opts)
         incong_name = set(res_types.split(',')).difference(set(cong_opts))
     incong_opts = st.sidebar.multiselect('选择不相容条件阶段名', incong_name)
     st.sidebar.write('将在后续计算中，包含以下不相容条件阶段的数据')
     if incong_opts:
-        st.sidebar.write(incong_opts)
+        st.write('选择的不相容条件阶段名：')
+        st.write(incong_opts)
     
     if cong_opts==[] or incong_opts==[]:
         st.warning('请至少选择一个相容条件阶段和一个不相容条件阶段')
@@ -428,7 +441,6 @@ if check_res == True:
         st.write('所有试次的平均反应时在所有参与者平均反应时± ', part_std_num, ' 个标准差以外的受试者数据将被剔除')
     
     total_flt_data = []
-    # if st.button(label='确认受试者剔除预处理', key=10):
     if part_speed_fast:
         part_fast_flt, part_fast_flt_id = total_speed_flt(user_data, 'fast', part_too_fast, part_too_fast_per)
         part_method_list.append({'方法': '总体过快反应', '参数': part_too_fast, '占比': part_too_fast_per, '剔除受试者数量': len(part_fast_flt_id)})
@@ -442,7 +454,7 @@ if check_res == True:
         part_times, part_times_id = total_rt_std_flt(user_data, part_std_num)
         part_method_list.append({'方法': '反应时超出群体反应时标准差', '参数': part_std_num, '剔除受试者数量': len(part_times_id)})
 
-    st.text('处理结果：')
+    st.text('② 受试者剔除-处理结果：')
     part_fb_list = []
     part_flt_list = []
     if part_speed_fast:
@@ -482,7 +494,6 @@ if check_res == True:
         trial_too_slow = st.sidebar.number_input('过慢反应阈值：', min_value=0, value=10000, placeholder="请输入整数时长...", key=7)
         st.write('所有试次中，反应时高于 ', trial_too_slow, ' ms 的试次数据将被剔除')
     
-    # if st.button(label='确认试次剔除预处理', key=11):
     if trial_speed_fast:
         trial_fast_flt, trial_fast_flt_id = trial_speed_flt(user_data, 'fast', trial_too_fast)
         trial_method_list.append({'方法': '试次过快反应', '参数': trial_too_fast, '剔除试次数量': len(trial_fast_flt_id)})
@@ -490,7 +501,7 @@ if check_res == True:
         trial_slow_flt, trial_slow_flt_id = trial_speed_flt(user_data,'slow', trial_too_slow)
         trial_method_list.append({'方法': '试次过慢反应', '参数': trial_too_slow, '剔除试次数量': len(trial_slow_flt_id)})
 
-    st.text('处理结果：')
+    st.text('③ 试次剔除-处理结果：')
     trial_fb_list = []
     trial_flt_list = []
     if trial_speed_fast:
@@ -503,14 +514,16 @@ if check_res == True:
     if part_fb_list != []:
         if trial_fb_list != []:
             trial_flt_res, trial_flt_data = flt_merge(trial_fb_list, trial_flt_list, total_flt_data, '试次编号')
-            # trial_flt_res, trial_flt_data = flt_merge(fb_list, flt_list, user_data, '试次编号')
             st.write(trial_flt_res)
+            trial_method = {'试次预处理方法': trial_method_list}
         else:
             st.write('*未选择试次预处理方法')
+            trial_flt_data = total_flt_data.copy()
+            st.text('确定不需要处理试次数据的话，可以继续下一步')
+            trial_method = {'试次预处理方法': '无'}
     else:
         st.write('*请先按受试者处理后，再进行试次处理')
     st.write('')
-    trial_method = {'试次预处理方法': trial_method_list}
     
     st.text('※确认完以上信息后再继续下一步！！')
     
@@ -528,37 +541,36 @@ if check_res == True:
         else:
             t_type = 2
             st.write('错误反应的反应时将替换为该试次反应时 + ', trial_wrong_val, ' ms')
-    
-    # if st.button(label='确认错误反应预处理', key=12):
-    trial_wrong_res = pd.DataFrame(columns=['试次编号','处理原因','详情'])
-    if part_fb_list != []:
-        if trial_fb_list != []:
-            if trial_wrong:
+        
+        trial_wrong_res = pd.DataFrame(columns=['试次编号','处理原因','详情'])
+        if part_fb_list != []:
+            if trial_fb_list != []:
                 trial_wrong_res, trial_wrong_data = trial_wrong_flt(trial_flt_data, t_type, trial_wrong_val)
                 wrong_method_list = {'方法': trial_wrong_choi, '参数': trial_wrong_val, '处理试次数量': len(trial_wrong_data)}
+                wrong_method = {'错误反应预处理方法': wrong_method_list}
         
-    st.text('处理结果：')
-    if part_fb_list != []:
-        if trial_fb_list != []:
-            st.write(trial_wrong_res)
-        else:
-            st.write('*请先按试次处理后，再进行错误处理')
     else:
-        st.write('*请先按受试者和试次处理后，再进行错误处理')
+        trial_wrong_data = trial_flt_data.copy()
+        st.text('确定不需要处理试次数据的话，可以继续下一步')
+        wrong_method = {'错误反应预处理方法': '无'}
+    
+        
+    st.text('④ 错误反应-处理结果：')
+    if trial_wrong:
+        st.write(trial_wrong_res)
+    else:
+        st.write('确定不需要处理错误试次的话，可以继续下一步')
     st.write('')
     
-    wrong_method = {'错误反应预处理方法': wrong_method_list}
-    # else:
-    #     trial_wrong_data = trial_flt_data.copy()
-    
     st.text('※确认完以上信息后再继续下一步！！')
-    
+
+
 confirm = False
 
 if check_name == True:
     st.write(' ')
     st.header('Step 4. 确认以上处理方式')
-    st.info('检查已选定的数据预处理方式，确认无误即可开始分析')
+    st.info('检查已选定的数据预处理方式，确认无误即可开始计算d值')
     
     st.subheader('已选定的处理方式', divider=True)
     st.text('受试者剔除标准')
@@ -570,7 +582,7 @@ if check_name == True:
     st.text('错误反应处理')
     st.write(wrong_method)
     
-    if st.button('确认', key=13):
+    if st.button('确认', type='primary', key=10):
         st.write('已确认处理方式')
         confirm = True
     
@@ -595,20 +607,28 @@ if confirm == True:
     res_data_file = convert_df(res_data)
 
     st.subheader('下载结果文件', divider='rainbow')
-    st.download_button(label='分析结果文件',
+    if st.download_button(label='分析结果文件',
                     data=res_data_file,
-                    file_name='analysis_result.csv',
-                    mime='csv', key=14)
+                    file_name='iat_analysis_result.csv',
+                    mime='csv', 
+                    type='primary',
+                    key=15):
+        st.balloons()
 
     st.write('')
-    st.info('完成~')
-    st.balloons()
+    st.write('')
+    st.info('至此,全部完成~')
+    
 
 st.write(' ')
 st.header('一些参考文献')
 st.write('[1]杨晨, & 陈增祥. (2019). 数字有形状吗?数字信息精确性和品牌标识形状的匹配效应. 心理学报, 51(7), 16.')
 st.write('[2]钱淼, 周立霞, 鲁甜甜, 翁梦星, & 傅根跃. (2015). 幼儿友好型内隐联想测验的建构及有效性. 心理学报, 47(7), 903–913.')
 st.write('[3]Greenwald, A. G., Nosek, B. A., & Banaji, M. R. (2003).Understanding and using the implicit association test: An improved scoring algorithm. Journal of Personality and Social Psychology,  85(2), 197–216.')
+
+st.write(' ')
+st.header('此工具开源地址')
+st.write('https://github.com/RyanY11/IATdatatool')
 
 st.write(' ')
 st.header('支持作者')

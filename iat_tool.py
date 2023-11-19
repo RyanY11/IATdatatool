@@ -20,7 +20,7 @@ Created on Tue Jul 18 19:30:59 2023
 
 import streamlit as st
 import pandas as pd
-import os
+# import os
 from PIL import Image
 
 # 数据模板下载
@@ -51,6 +51,7 @@ def check_data(dataframe):
         else:
             st.info('※数据表有缺失值，详见下表：')
             st.write(check_null)
+            st.write('建议检查数据表，处理后再重新上传')
     else:
         st.info(f"※数据表缺少以下列：{', '.join(missing)}")
         return False
@@ -304,7 +305,7 @@ def data_descriptive(dataframe):
 
 
 # 生成结果文件
-@st.cache_data
+# @st.cache_data
 def core_analysis(dataframe, cong_list, incong_list):
     '''
     输入——
@@ -320,16 +321,19 @@ def core_analysis(dataframe, cong_list, incong_list):
     part_list = dataframe['Participant'].unique().tolist()
     for i in part_list:
         part_df = dataframe[(dataframe['Participant']==i)]
+        
+        part_cong_df = part_df.query("Running in @cong_list")
+        part_cong_rt_avg = round((part_cong_df['Stim_RT'].mean()), 3)
+        part_cong_rt_std = round((part_cong_df['Stim_RT'].std()), 3)
+        
+        part_incong_df = part_df.query("Running in @incong_list")
+        part_incong_rt_avg = round((part_incong_df['Stim_RT'].mean()), 3)
+        part_incong_rt_std = round((part_incong_df['Stim_RT'].std()), 3)
+        
         both_list = cong_list + incong_list
         part_both_df = part_df.query("Running in @both_list")
         part_both_rt_avg = round((part_both_df['Stim_RT'].mean()), 3)
         part_both_rt_std = round((part_both_df['Stim_RT'].std()), 3)
-        part_cong_df = part_df.query("Running in @cong_list")
-        part_cong_rt_avg = round((part_cong_df['Stim_RT'].mean()), 3)
-        part_cong_rt_std = round((part_cong_df['Stim_RT'].std()), 3)
-        part_incong_df = part_df.query("Running in @incong_list")
-        part_incong_rt_avg = round((part_incong_df['Stim_RT'].mean()), 3)
-        part_incong_rt_std = round((part_incong_df['Stim_RT'].std()), 3)
         
         d_val = round(((part_incong_rt_avg - part_cong_rt_avg) / part_both_rt_std), 3)
         
@@ -344,12 +348,12 @@ def core_analysis(dataframe, cong_list, incong_list):
 # 页面逻辑与绘制
 st.title('IAT数据处理工具')
 st.info('工具简介')
-st.text('Hi，欢迎你来到这~')
+st.write('Hi，欢迎你来到这~')
 st.write(' ')
-st.text('这是一个在线的IAT（内隐联想测验）数据处理工具，它能够帮助你便捷地处理研究参与者在IAT实验中的反应时和正确率数据，并最终完成内隐方向强度d值的计算。')
-st.text('接下来，请按照页面上的指示，上传固定好格式的实验数据表格，依据你的参考文献选取各项数据处理的方式和参数，确认后即可在页面上看到自动处理的结果，并支持下载结果表格。')
-st.text('这是一个开源的小工具，开源地址详见页面末尾。')
-st.text('此外，请放心，你的实验数据上传后只是在浏览器本地的缓存中进行处理，并不会泄露。')
+st.write('这是一个在线的IAT（内隐联想测验）数据处理工具，它能够帮助你便捷地处理研究参与者在IAT实验中的反应时和正确率数据，并最终完成内隐方向强度d值的计算。')
+st.write('接下来，请按照页面上的指示，上传固定好格式的实验数据表格，依据你的参考文献选取各项数据处理的方式和参数，确认后即可在页面上看到自动处理的结果，并支持下载结果表格。')
+st.write('这是一个开源的小工具，开源地址详见页面末尾。')
+st.write('此外，请放心，你的实验数据上传后只是在浏览器本地的缓存中进行处理，并不会泄露。')
 st.write(' ')
 
 part_method = {}
@@ -358,18 +362,21 @@ wrong_method = {}
 
 st.header('Step 1. 下载数据模板')
 st.info('点击下载数据模板，并按照模板填写数据表')
-st.text('数据表中需要包含的信息：/n受试者编号（建议为纯数字），/n该trial属于实验的阶段名称（比如stage4代表联合测验相容条件，stage7代表联合测验反转不相容条件）\
-        /n该trial的反应时，/n该trial的正误')
+st.write('数据表中需要包含的信息：')
+st.write('Participant - 受试者编号（建议为纯数字）')
+st.write('Running - 该trial属于实验的阶段名称（比如stage4代表联合测验相容条件，stage7代表联合测验反转不相容条件）')
+st.write('Stim_ACC - 该trial的反应时')
+st.write('Stim_RT - 该trial的正误')
 st.write(' ')
 st.text('※请勿改动数据模板的列名！！')
 
-local_path = os.getcwd()
-data_model = convert_df(pd.read_csv(os.path.join(local_path, 'data_sample.csv')))
+# local_path = os.getcwd()
+# data_model = convert_df(pd.read_csv(os.path.join(local_path, 'data_sample.csv')))
 
-st.download_button('下载数据模板',
-                   data=data_model,
-                   file_name='data_sample.csv',
-                   mime='text/csv', key=9)
+# st.download_button('下载数据模板',
+#                    data=data_model,
+#                    file_name='data_sample.csv',
+#                    mime='text/csv', key=9)
 
 st.write(' ')
 st.header('Step 2. 上传IAT实验数据')
@@ -480,6 +487,7 @@ if check_res == True:
     part_method = {'受试者预处理方法': part_method_list}
     
     st.text('※确认完以上信息后再继续下一步！！')
+    st.write('')
     
     st.sidebar.subheader('③ 试次剔除标准', divider=True)
     trial_method_list = []
@@ -526,6 +534,7 @@ if check_res == True:
     st.write('')
     
     st.text('※确认完以上信息后再继续下一步！！')
+    st.write('')
     
     st.sidebar.subheader('④ 错误反应处理', divider=True)
     wrong_method_list = ''
@@ -559,10 +568,11 @@ if check_res == True:
     if trial_wrong:
         st.write(trial_wrong_res)
     else:
-        st.write('确定不需要处理错误试次的话，可以继续下一步')
+        st.text('确定不需要处理错误试次的话，可以继续下一步')
     st.write('')
     
     st.text('※确认完以上信息后再继续下一步！！')
+    st.write('')
 
 
 confirm = False
@@ -603,6 +613,7 @@ if confirm == True:
     
     st.write(res_data)
     st.write('')
+    # st.table(res_data)
     
     res_data_file = convert_df(res_data)
 

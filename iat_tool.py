@@ -20,7 +20,7 @@ Created on Tue Jul 18 19:30:59 2023
 
 import streamlit as st
 import pandas as pd
-# import os
+import os
 from PIL import Image
 
 # 数据模板下载
@@ -68,7 +68,7 @@ def data_overview(dataframe):
     '''
     rows = str(dataframe.shape[0])
     parts = str(dataframe['Participant'].nunique())
-    types = ', '.join(dataframe['Running'].unique().tolist())
+    types = ','.join(dataframe['Running'].unique().tolist())
     
     return (rows, parts, types)
 
@@ -304,8 +304,24 @@ def data_descriptive(dataframe):
     return output_df
 
 
+# 计算数据指标
+def val_calculate(dataframe, listname):
+    '''
+    输入——
+    dataframe: 传入数据表
+    cong_list: 条件列表
+    返回——
+    rt_avg: 包含条件列表中名称的反应时均值
+    rt_std: 包含条件列表中名称的反应时标准差
+    '''
+    
+    df_slice = dataframe.loc[dataframe['Running'].isin(listname),:]
+    rt_avg = round((df_slice['Stim_RT'].mean()), 3)
+    rt_std = round((df_slice['Stim_RT'].std()), 3)
+    
+    return rt_avg, rt_std
+
 # 生成结果文件
-# @st.cache_data
 def core_analysis(dataframe, cong_list, incong_list):
     '''
     输入——
@@ -322,18 +338,11 @@ def core_analysis(dataframe, cong_list, incong_list):
     for i in part_list:
         part_df = dataframe[(dataframe['Participant']==i)]
         
-        part_cong_df = part_df.query("Running in @cong_list")
-        part_cong_rt_avg = round((part_cong_df['Stim_RT'].mean()), 3)
-        part_cong_rt_std = round((part_cong_df['Stim_RT'].std()), 3)
-        
-        part_incong_df = part_df.query("Running in @incong_list")
-        part_incong_rt_avg = round((part_incong_df['Stim_RT'].mean()), 3)
-        part_incong_rt_std = round((part_incong_df['Stim_RT'].std()), 3)
-        
         both_list = cong_list + incong_list
-        part_both_df = part_df.query("Running in @both_list")
-        part_both_rt_avg = round((part_both_df['Stim_RT'].mean()), 3)
-        part_both_rt_std = round((part_both_df['Stim_RT'].std()), 3)
+
+        part_cong_rt_avg, part_cong_rt_std = val_calculate(part_df, cong_list)
+        part_incong_rt_avg, part_incong_rt_std = val_calculate(part_df, incong_list)
+        part_both_rt_avg, part_both_rt_std = val_calculate(part_df, both_list)
         
         d_val = round(((part_incong_rt_avg - part_cong_rt_avg) / part_both_rt_std), 3)
         
@@ -370,13 +379,13 @@ st.write('Stim_RT - 该trial的正误')
 st.write(' ')
 st.text('※请勿改动数据模板的列名！！')
 
-# local_path = os.getcwd()
-# data_model = convert_df(pd.read_csv(os.path.join(local_path, 'data_sample.csv')))
+local_path = os.getcwd()
+data_model = convert_df(pd.read_csv(os.path.join(local_path, 'data_sample.csv')))
 
-# st.download_button('下载数据模板',
-#                    data=data_model,
-#                    file_name='data_sample.csv',
-#                    mime='text/csv', key=9)
+st.download_button('下载数据模板',
+                   data=data_model,
+                   file_name='data_sample.csv',
+                   mime='text/csv', key=9)
 
 st.write(' ')
 st.header('Step 2. 上传IAT实验数据')
@@ -553,10 +562,9 @@ if check_res == True:
         
         trial_wrong_res = pd.DataFrame(columns=['试次编号','处理原因','详情'])
         if part_fb_list != []:
-            if trial_fb_list != []:
-                trial_wrong_res, trial_wrong_data = trial_wrong_flt(trial_flt_data, t_type, trial_wrong_val)
-                wrong_method_list = {'方法': trial_wrong_choi, '参数': trial_wrong_val, '处理试次数量': len(trial_wrong_data)}
-                wrong_method = {'错误反应预处理方法': wrong_method_list}
+            trial_wrong_res, trial_wrong_data = trial_wrong_flt(trial_flt_data, t_type, trial_wrong_val)
+            wrong_method_list = {'方法': trial_wrong_choi, '参数': trial_wrong_val, '处理试次数量': len(trial_wrong_data)}
+            wrong_method = {'错误反应预处理方法': wrong_method_list}
         
     else:
         trial_wrong_data = trial_flt_data.copy()
@@ -607,13 +615,12 @@ if confirm == True:
 if confirm == True:
     st.write(' ')
     st.header('Step 6. 得到分析结果')
-    st.info('计算后的结果展示及下载')
+    st.info('计算后的结果展示及下载（保留3位小数）')
     
     res_data = core_analysis(trial_wrong_data, cong_opts, incong_opts)
     
     st.write(res_data)
     st.write('')
-    # st.table(res_data)
     
     res_data_file = convert_df(res_data)
 

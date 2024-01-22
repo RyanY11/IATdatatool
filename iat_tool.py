@@ -29,7 +29,7 @@ def convert_df(dataframe):
     '''
     读取数据模板，再次转换为CSV支持下载
     '''
-    return dataframe.to_csv().encode('utf-8')
+    return dataframe.to_csv().encode('utf_8_sig')
 
 
 # 数据表校验

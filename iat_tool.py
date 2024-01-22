@@ -634,6 +634,8 @@ if confirm == True:
         st.balloons()
 
     st.write('')
+    st.info('若Excel打开下载后的表格出现中文乱码，请先用记事本打开，另存为“带BOM的UTF-8”的编码格式后，再用Excel打开即可')
+    st.write('')
     st.write('')
     st.info('至此,全部完成~')
     

@@ -68,7 +68,7 @@ def data_overview(dataframe):
     '''
     rows = str(dataframe.shape[0])
     parts = str(dataframe['Participant'].nunique())
-    types = ', '.join(str(dataframe['Running'].unique()).tolist())
+    types = ', '.join(dataframe['Running'].unique().tolist())
     
     return (rows, parts, types)
 
@@ -378,6 +378,7 @@ st.write('Stim_ACC - 该trial的反应时')
 st.write('Stim_RT - 该trial的正误')
 st.write(' ')
 st.text('※请勿改动数据模板的列名！！')
+st.text('※Running列请勿使用纯数字')
 
 local_path = os.getcwd()
 data_model = convert_df(pd.read_csv(os.path.join(local_path, 'data_sample.csv')))

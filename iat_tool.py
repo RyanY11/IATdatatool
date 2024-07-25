@@ -68,7 +68,7 @@ def data_overview(dataframe):
     '''
     rows = str(dataframe.shape[0])
     parts = str(dataframe['Participant'].nunique())
-    types = ', '.join(dataframe['Running'].unique().tolist())
+    types = ','.join(dataframe['Running'].unique().tolist())
     
     return (rows, parts, types)
 

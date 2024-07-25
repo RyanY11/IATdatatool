@@ -491,6 +491,7 @@ if check_res == True:
         total_flt_res, total_flt_data = flt_merge(part_fb_list, part_flt_list, user_data, '受试者编号')
         st.write(total_flt_res)
     else:
+        total_flt_data = user_data.copy()
         st.write('*未选择受试者预处理方法')
     
     st.write('')
@@ -501,7 +502,7 @@ if check_res == True:
     
     st.sidebar.subheader('③ 试次剔除标准', divider=True)
     trial_method_list = []
-    trial_flt_data = []
+    trial_flt_data = user_data.copy()
     
     trial_speed_fast = st.sidebar.checkbox('试次过快反应')
     if trial_speed_fast:

@@ -592,10 +592,12 @@ if check_res == True:
         # st.sidebar.write("D值相减方式为： 不相容任务 - 相容任务")
         st.text('D值相减方式为： 不相容任务 - 相容任务')
         direction = 'incong - cong'
+        dire_type = {'D值相减方式为': '不相容任务 - 相容任务'}
     else:
         # st.sidebar.write("D值相减方式为： 相容任务 - 不相容任务")
         st.text('D值相减方式为： 相容任务 - 不相容任务')
         direction = 'cong - incong'
+        dire_type = {'D值相减方式为': '相容任务 - 不相容任务'}
     
     st.text('※确认完以上信息后再继续下一步！！')
     st.write('')
@@ -616,6 +618,9 @@ if check_name == True:
     
     st.text('错误反应处理')
     st.write(wrong_method)
+
+    st.text('D值相减方式')
+    st.write(dire_type)
     
     if st.button('确认', type='primary', key=10):
         st.write('已确认处理方式')

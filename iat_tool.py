@@ -589,11 +589,11 @@ if check_res == True:
     dire = st.sidebar.radio('请选择', ['不相容任务 - 相容任务','相容任务 - 不相容任务'])
     
     if dire == "不相容任务 - 相容任务":
-        st.sidebar.write("D值相减方式为： 不相容任务 - 相容任务")
+        # st.sidebar.write("D值相减方式为： 不相容任务 - 相容任务")
         st.text('D值相减方式为： 不相容任务 - 相容任务')
         direction = 'incong - cong'
     else:
-        st.sidebar.write("D值相减方式为： 相容任务 - 不相容任务")
+        # st.sidebar.write("D值相减方式为： 相容任务 - 不相容任务")
         st.text('D值相减方式为： 相容任务 - 不相容任务')
         direction = 'cong - incong'
     

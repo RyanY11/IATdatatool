@@ -586,7 +586,7 @@ if check_res == True:
     st.text('⑤ D值相减方式')
 
     st.sidebar.subheader('⑤ 选择D值相减方式', divider=True)
-    dire = st.radio('请选择', ['不相容任务 - 相容任务','相容任务 - 不相容任务'])
+    dire = st.sidebar.radio('请选择', ['不相容任务 - 相容任务','相容任务 - 不相容任务'])
     
     if dire == "不相容任务 - 相容任务":
         st.sidebar.write("D值相减方式为： 不相容任务 - 相容任务")

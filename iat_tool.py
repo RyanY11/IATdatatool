@@ -29,7 +29,7 @@ def convert_df(dataframe):
     '''
     读取数据模板，再次转换为CSV支持下载
     '''
-    return dataframe.to_csv(index=False, encoding='utf_8_sig')
+    return dataframe.to_csv().encode('utf-8')
 
 
 # 数据表校验
@@ -344,7 +344,10 @@ def core_analysis(dataframe, cong_list, incong_list):
         part_incong_rt_avg, part_incong_rt_std = val_calculate(part_df, incong_list)
         part_both_rt_avg, part_both_rt_std = val_calculate(part_df, both_list)
         
-        d_val = round(((part_incong_rt_avg - part_cong_rt_avg) / part_both_rt_std), 3)
+        if direction == 'incong - cong':
+            d_val = round(((part_incong_rt_avg - part_cong_rt_avg) / part_both_rt_std), 3)
+        else:
+            d_val = round(((part_cong_rt_avg - part_incong_rt_avg) / part_both_rt_std), 3)
         
         add_line = {'受试者编号': i, '一致反应时均值': part_cong_rt_avg, '一致反应时标准差': part_cong_rt_std, 
                    '不一致反应时均值': part_incong_rt_avg, '不一致反应时标准差': part_incong_rt_std, 
@@ -378,7 +381,6 @@ st.write('Stim_ACC - 该trial的正误')
 st.write('Stim_RT - 该trial的反应时')
 st.write(' ')
 st.text('※请勿改动数据模板的列名！！')
-st.text('※Running列请勿使用纯数字')
 
 local_path = os.getcwd()
 data_model = convert_df(pd.read_csv(os.path.join(local_path, 'data_sample.csv')))
@@ -491,7 +493,6 @@ if check_res == True:
         total_flt_res, total_flt_data = flt_merge(part_fb_list, part_flt_list, user_data, '受试者编号')
         st.write(total_flt_res)
     else:
-        total_flt_data = user_data.copy()
         st.write('*未选择受试者预处理方法')
     
     st.write('')
@@ -502,7 +503,7 @@ if check_res == True:
     
     st.sidebar.subheader('③ 试次剔除标准', divider=True)
     trial_method_list = []
-    trial_flt_data = user_data.copy()
+    trial_flt_data = []
     
     trial_speed_fast = st.sidebar.checkbox('试次过快反应')
     if trial_speed_fast:
@@ -581,9 +582,23 @@ if check_res == True:
         st.text('确定不需要处理错误试次的话，可以继续下一步')
     st.write('')
     
+    
+    st.text('⑤ D值相减方式')
+
+    st.sidebar.subheader('⑤ 选择D值相减方式', divider=True)
+    dire = st.radio('请选择', ['不相容任务 - 相容任务','相容任务 - 不相容任务'])
+    
+    if dire == "不相容任务 - 相容任务":
+        st.sidebar.write("D值相减方式为： 不相容任务 - 相容任务")
+        st.text('D值相减方式为： 不相容任务 - 相容任务')
+        direction = 'incong - cong'
+    else:
+        st.sidebar.write("D值相减方式为： 相容任务 - 不相容任务")
+        st.text('D值相减方式为： 相容任务 - 不相容任务')
+        direction = 'cong - incong'
+    
     st.text('※确认完以上信息后再继续下一步！！')
     st.write('')
-
 
 confirm = False
 
@@ -635,8 +650,6 @@ if confirm == True:
                     key=15):
         st.balloons()
 
-    st.write('')
-    st.info('若Excel打开下载后的表格出现中文乱码，请先用记事本打开，另存为“带BOM的UTF-8”的编码格式后，再用Excel打开即可')
     st.write('')
     st.write('')
     st.info('至此,全部完成~')

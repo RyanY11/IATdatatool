@@ -568,6 +568,8 @@ if check_res == True:
             trial_wrong_res, trial_wrong_data = trial_wrong_flt(trial_flt_data, t_type, trial_wrong_val)
             wrong_method_list = {'方法': trial_wrong_choi, '参数': trial_wrong_val, '处理试次数量': len(trial_wrong_data)}
             wrong_method = {'错误反应预处理方法': wrong_method_list}
+        else:
+            trial_wrong_data = user_data.copy()
         
     else:
         trial_wrong_data = trial_flt_data.copy()
